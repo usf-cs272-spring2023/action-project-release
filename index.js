@@ -2,9 +2,9 @@ module.exports = async ({github, context, core, fs}) => {
   // store results
   const out = {};
 
-  // get required inputs
-  out.project_repo = core.getInput('project_repo', { required: true });
-  out.release_tag  = core.getInput('release_tag',  { required: true });
+  // get inputs from environment
+  out.project_repo = process.env.PROJECT_REPO;
+  out.release_tag  = process.env.RELEASE_TAG;
 
   core.info(`Repository: ${out.project_repo}`);
   core.info(`   Release: ${out.release_tag}`);

@@ -18,6 +18,9 @@ runs:
         repository: usf-cs272-fall2022/action-project-version
 
     - uses: actions/github-script@v6
+      env:
+        PROJECT_REPO: "${{ inputs.project_repo }}"
+        RELEASE_TAG:  "${{ inputs.release_tag }}"
       with:
         script: |
           const fs = require('fs');
