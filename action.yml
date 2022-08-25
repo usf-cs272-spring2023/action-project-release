@@ -1,0 +1,26 @@
+name: "Project Version Action"
+description: "Reusable action for checking the project release version"
+
+inputs:
+  project_repo:
+    description: "Repository with project code"
+    required: true
+    default: "project-"
+  
+  release_tag:
+    description: "Project release number or tag (e.g. v1.0.0)"
+    required: true
+  
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const script = require('index.js')
+          const result = await script({github, context, core, fs});
+          return result;
+  

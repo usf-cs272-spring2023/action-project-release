@@ -1,0 +1,59 @@
+name: 'Project Release'
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_repo:
+        description: "Repository with project code"
+        required: true
+        default: "project-"
+
+      release_tag:
+        description: "Project release number or tag (e.g. v1.0.0)"
+        required: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    name: Project Version
+
+    outputs:
+      results_name: "${{ steps.parse-version.outputs.results_name }}"
+      results_json: "${{ steps.parse-version.outputs.results_json }}"
+
+    steps:
+      - name: Parse Version
+        id: parse-version
+        uses: usf-cs272-fall2022/action-project-version@main
+        with:
+          project_repo: "${{ inputs.project_repo }}"
+          release_tag:  "${{ inputs.release_tag }}"
+
+  result:
+    runs-on: ubuntu-latest
+    name: Output Results
+    needs: check
+
+    env:
+      RESULTS_NAME: "${{ needs.check.outputs.results_name }}"
+      RESULTS_JSON: "${{ needs.check.outputs.results_json }}"
+
+    steps:
+      - name: Download Results
+        id: download-results
+        uses: actions/download-artifact@v3
+        with:
+          name: '${{ env.RESULTS_NAME }}'
+
+      - name: Display Results
+        id: display-results
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const output = require(`./${process.env.RESULTS_JSON}`);
+            for (const property in output) {
+              console.log(property, JSON.stringify(output[property]));
+            }
+            console.log('');
+
+            return output;
