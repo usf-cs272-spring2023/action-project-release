@@ -51,7 +51,7 @@ module.exports = async ({github, context, core, fs}) => {
     const previous_tag = `v${out.project_num}.${out.review_num}.${out.patch_num - 1}`;
     
     try {
-      const result = github.rest.repos.getReleaseByTag({
+      const result = await github.rest.repos.getReleaseByTag({
         owner: context.repo.owner,
         repo: out.project_repo,
         tag: previous_tag
