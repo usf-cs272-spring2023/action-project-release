@@ -24,6 +24,49 @@ module.exports = async ({github, context, core, fs}) => {
   out.review_num  = parseInt(matched[2]);
   out.patch_num   = parseInt(matched[3]);
 
+  // out.project_ok = false;
+  // out.review_ok  = false;
+  
+
+  // let [someResult, anotherResult] = await Promise.all([
+  //   someCall(), 
+  //   octokit.rest.repos.listReleases({
+  //     owner: context.repo.owner,
+  //     repo: context.repo.repo,
+  //   });
+  // ]);
+
+  // check project number (p)
+  // must have 2 review issues for project (p - 1)
+
+  // check review number (r)
+  // must have (r - 1) approved pull requests
+
+  // verify the patch number
+  if (out.patch_num === 0) {
+    out.patch_ok = true;
+  }
+  else {
+    // see if have a release with (patch - 1) version number
+    const previous_tag = `v${out.project_num}.${out.review_num}.${out.patch_num - 1}`;
+    
+    try {
+      const result = github.rest.repos.getReleaseByTag({
+        owner: context.repo.owner,
+        repo: out.project_repo,
+        tag: previous_tag
+      });
+
+      if (result.status === 200 && result.data.length === 1) {
+        out.patch_ok = true;
+      }
+    }
+    catch (error) {
+      out.patch_ok = false;
+      out.patch_error = `Unable to find previous ${previous_tag} release. Check the last version number (the patch) is incremented properly.`;
+    }
+  }
+
   // add artifact name and json file
   out.results_name = 'check-project-release';
   out.results_json = `${out.results_name}.json`;
