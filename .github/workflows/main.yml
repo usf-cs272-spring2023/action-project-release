@@ -33,8 +33,8 @@ jobs:
         shell: bash
         run: |
           echo "${{ toJSON(steps.parse-version.outputs) }}"
-           echo "Results Name: ${{ steps.parse-version.outputs.results_name }}"
-           echo "Results JSON: ${{ steps.parse-version.outputs.results_json }}"
+          echo "Results Name: ${{ steps.parse-version.outputs.results_name }}"
+          echo "Results JSON: ${{ steps.parse-version.outputs.results_json }}"
 
   result:
     runs-on: ubuntu-latest

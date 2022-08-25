@@ -12,10 +12,12 @@ inputs:
 
 outputs:
   results_name:
-    description: 'Name of results artifact'
+    description: "Name of results artifact"
+    value: "${{ steps.check-version.outputs.results_name }}"
 
   results_json:
-    description: 'Name of results JSON file'
+    description: "Name of results JSON file"
+    value: "${{ steps.check-version.outputs.results_name }}"
 
 runs:
   using: "composite"
