@@ -13,11 +13,15 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v3
+    - name: 'Checkout Action'
+      id: checkout-action
+      uses: actions/checkout@v3
       with:
         repository: usf-cs272-fall2022/action-project-version
 
-    - uses: actions/github-script@v6
+    - name: 'Check Project Version'
+      id: check-version
+      uses: actions/github-script@v6
       env:
         PROJECT_REPO: "${{ inputs.project_repo }}"
         RELEASE_TAG:  "${{ inputs.release_tag }}"
@@ -28,3 +32,9 @@ runs:
           const result = await script({github, context, core, fs});
           return result;
   
+    - name: 'Upload Results'
+      uses: actions/upload-artifact@v3
+      id: upload-artifact
+      with:
+        name: "${{ steps.check-version.outputs.results_name }}"
+        path: "${{ steps.check-version.outputs.results_json }}"
