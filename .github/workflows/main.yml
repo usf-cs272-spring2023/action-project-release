@@ -29,6 +29,12 @@ jobs:
           project_repo: "${{ inputs.project_repo }}"
           release_tag:  "${{ inputs.release_tag }}"
 
+      - name: Step Outputs
+        shell: bash
+        run: |
+           echo "Results Name: ${{ steps.parse-version.outputs.results_name }}"
+           echo "Results JSON: ${{ steps.parse-version.outputs.results_json }}"
+
   result:
     runs-on: ubuntu-latest
     name: Output Results
