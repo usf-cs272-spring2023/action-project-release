@@ -15,12 +15,18 @@ runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v3
+      with:
+        repository: usf-cs272-fall2022/action-project-version
+
+    - shell: bash
+      run: |
+        ls -laR
 
     - uses: actions/github-script@v6
       with:
         script: |
           const fs = require('fs');
-          const script = require('index.js')
+          const script = require('index.js');
           const result = await script({github, context, core, fs});
           return result;
   
