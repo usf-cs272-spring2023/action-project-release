@@ -9,7 +9,14 @@ inputs:
   release_tag:
     description: "Project release number or tag (e.g. v1.0.0)"
     required: true
-  
+
+outputs:
+  results_name:
+    description: 'Name of results artifact'
+
+  results_json:
+    description: 'Name of results JSON file'
+
 runs:
   using: "composite"
   steps:
