@@ -29,12 +29,12 @@ jobs:
           project_repo: "${{ inputs.project_repo }}"
           release_tag:  "${{ inputs.release_tag }}"
 
-      - name: Step Outputs
-        shell: bash
-        run: |
-          echo "${{ toJSON(steps.parse-version.outputs) }}"
-          echo "Results Name: ${{ steps.parse-version.outputs.results_name }}"
-          echo "Results JSON: ${{ steps.parse-version.outputs.results_json }}"
+      # - name: Step Outputs
+      #   shell: bash
+      #   run: |
+      #     echo "${{ toJSON(steps.parse-version.outputs) }}"
+      #     echo "Results Name: ${{ steps.parse-version.outputs.results_name }}"
+      #     echo "Results JSON: ${{ steps.parse-version.outputs.results_json }}"
 
   result:
     runs-on: ubuntu-latest
@@ -59,8 +59,7 @@ jobs:
           script: |
             const output = require(`./${process.env.RESULTS_JSON}`);
             for (const property in output) {
-              console.log(property, JSON.stringify(output[property]));
+              core.info(`${property}: ${JSON.stringify(output[property])}`);
             }
-            console.log('');
-
+            core.info('');
             return output;
