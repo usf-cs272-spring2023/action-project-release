@@ -17,7 +17,7 @@ outputs:
 
   results_json:
     description: "Name of results JSON file"
-    value: "${{ steps.check-version.outputs.results_name }}"
+    value: "${{ steps.check-version.outputs.results_json }}"
 
 runs:
   using: "composite"
