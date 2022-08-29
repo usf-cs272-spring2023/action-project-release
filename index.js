@@ -46,7 +46,7 @@ module.exports = async ({github, context, core, fs}) => {
     fs.writeFileSync(out.results_json, JSON.stringify(out));
 
     const written = fs.readFileSync(out.results_json);
-    core.info(written);
+    core.info(`JSON: ${written}`);
     core.endGroup();
 
     // set and return results
