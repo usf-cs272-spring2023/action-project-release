@@ -44,8 +44,9 @@ module.exports = async ({github, context, core, fs}) => {
     // write results to file
     core.startGroup('Creating artifact...');
     fs.writeFileSync(out.results_json, JSON.stringify(out));
-    core.setOutput('results_name', out.results_name);
-    core.setOutput('results_json', out.results_json);
+
+    const written = fs.readFileSync(out.results_json);
+    core.info(written);
     core.endGroup();
 
     // set and return results
