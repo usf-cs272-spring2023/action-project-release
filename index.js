@@ -52,9 +52,6 @@ module.exports = async ({github, context, core, fs}) => {
     // set and return results
     core.startGroup('Setting output...');
     for (const property in out) {
-      // make sure value in json output
-      out[property] = JSON.stringify(out[property]);
-
       // output and set result
       console.log(`${property}: ${out[property]}`);
       core.setOutput(property, out[property]);
