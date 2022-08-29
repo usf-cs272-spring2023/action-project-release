@@ -97,11 +97,13 @@ runs:
     - name: 'Check Artifact'
       id: check-artifact
       shell: bash
-      run: "ls -la"
+      run: |
+        ls *.json
+        cat ./${{ steps.check-release.outputs.results_json }}
 
     - name: 'Upload Results'
       uses: actions/upload-artifact@v3
       id: upload-results
       with:
         name: "${{ steps.check-release.outputs.results_name }}"
-        path: "${{ steps.check-release.outputs.results_json }}"
+        path: "./${{ steps.check-release.outputs.results_json }}"
