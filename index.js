@@ -28,6 +28,21 @@ module.exports = async ({github, context, core, fs}) => {
     out.version_review  = parseInt(matched[2]);
     out.version_patch   = parseInt(matched[3]);
     out.version_number  = `v${out.version_project}.${out.version_review}.${out.version_patch}`;
+
+    // get all issues
+    const issues_response = await github.rest.issues.listForRepo({
+      owner: context.repo.owner,
+      repo: out.project_repo,
+      state: 'all',
+      per_page: 100
+    });
+
+    if (issues_response.status !== 200) {
+      console.info(JSON.stringify(issues_response));
+    }
+
+    const issues = issues_response.data;
+    core.info(JSON.stringify(issues));
   }
   catch (error) {
     out.error_count++;
