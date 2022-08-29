@@ -5,6 +5,21 @@ module.exports = async ({github, context, core, fs}) => {
     error_messages: []
   };
 
+  // common operations when an error is found
+  const handleError = function(message, fail) {
+    out.error_count++;
+    out.error_messages.push(message);
+
+    if (fail) {
+      core.error(message);
+    }
+    else {
+      core.warning(message);
+    }
+    
+    return out;
+  };
+
   // get inputs from environment and add to outputs
   out.project_repo = process.env.PROJECT_REPO;
   out.release_tag  = process.env.RELEASE_TAG;
@@ -20,7 +35,8 @@ module.exports = async ({github, context, core, fs}) => {
 
     if (matched === null || matched.length !== 4) {
       // cannot continue without a parsable version number
-      core.error(`Unable to parse "${out.release_tag}" into major, minor, and patch version numbers.`);
+      const message = `Unable to parse "${out.release_tag}" into major, minor, and patch version numbers.`;
+      return handleError(message, true);
     }
 
     // save parsed values
@@ -38,15 +54,15 @@ module.exports = async ({github, context, core, fs}) => {
     });
 
     if (issues_response.status !== 200) {
-      console.info(JSON.stringify(issues_response));
+      const message = `Unable to fetch issues from ${out.project_repo} (status code: ${issues_response.status}).`;
+      return handleError(message, true);
     }
 
     const issues = issues_response.data;
-    core.info(JSON.stringify(issues));
+    core.info(`Found ${issues.length} issues in ${out.project_repo}...`);
   }
   catch (error) {
-    out.error_count++;
-    out.error_messages.push(error.message);
+    return handleError(error.message, true);
   }
   finally {
     // convert error messages to string
