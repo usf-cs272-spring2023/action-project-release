@@ -1,3 +1,3 @@
-# CS 272 Project Version Action
+# CS 272 Project Release Action
 
-GitHub action to check the project version number.
+GitHub action to check the project release and version number.
