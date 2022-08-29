@@ -46,21 +46,28 @@ module.exports = async ({github, context, core, fs}) => {
     out.version_patch   = parseInt(matched[3]);
     out.version_number  = `v${out.version_project}.${out.version_review}.${out.version_patch}`;
 
-    // get all issues
-    const issues_response = await github.rest.issues.listForRepo({
-      owner: context.repo.owner,
-      repo: out.project_repo,
-      state: 'all',
-      per_page: 100
-    });
+    let issues = undefined;
 
-    if (issues_response.status !== 200) {
-      const message = `Unable to fetch issues from ${out.project_repo} (status code: ${issues_response.status}).`;
-      return handleError(message, true);
+    // get all issues (catch 404 errors and output more useful message)
+    try {
+      const issues_response = await github.rest.issues.listForRepo({
+        owner: context.repo.owner,
+        repo: out.project_repo,
+        state: 'all',
+        per_page: 100
+      });
+  
+      if (issues_response.status !== 200) {
+        throw new Error(`${issues_response.status} Status`);
+      }
+
+      core.info(`Found ${issues.length} issues in ${out.project_repo}...`);
+      issues = issues_response.data;
     }
-
-    const issues = issues_response.data;
-    core.info(`Found ${issues.length} issues in ${out.project_repo}...`);
+    catch (error) {
+      const message = `Unable to fetch issues from ${out.project_repo}: ${error.message}).`;
+      return handleError(message, true);
+    } 
   }
   catch (error) {
     return handleError(error.message, true);
