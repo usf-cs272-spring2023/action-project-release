@@ -68,8 +68,9 @@ module.exports = async ({github, context, core, fs}) => {
     }
     catch (error) {
       const message = `Unable to fetch releases, issues, and/or pull requests from ${out.project_repo}: ${error.message}.`;
+      console.trace(error);
       return handleError(message, true);
-    } 
+    }
   }
   catch (error) {
     return handleError(error.message, true);
