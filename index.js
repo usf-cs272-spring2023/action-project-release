@@ -46,26 +46,28 @@ module.exports = async ({github, context, core, fs}) => {
     out.version_patch   = parseInt(matched[3]);
     out.version_number  = `v${out.version_project}.${out.version_review}.${out.version_patch}`;
 
-    let issues = undefined;
+    // default parameters for github API requests
+    const params = {
+      owner: context.repo.owner,
+      repo: out.project_repo,
+      per_page: 100
+    }
 
-    // get all issues (catch 404 errors and output more useful message)
+    // fetch all releases, issues, and reviews
+    const fetch_releases = github.rest.repos.listReleases(params);
+    const fetch_issues   = github.rest.issues.listForRepo({...params, state: 'all'});
+    const fetch_reviews  = github.rest.pulls.list({...params, state: 'all'});
+    const fetch_all = [fetch_releases, fetch_issues, fetch_reviews];
+
     try {
-      const issues_response = await github.rest.issues.listForRepo({
-        owner: context.repo.owner,
-        repo: out.project_repo,
-        state: 'all',
-        per_page: 100
-      });
-  
-      if (issues_response.status !== 200) {
-        throw new Error(`${issues_response.status} Status`);
-      }
+      const [found_releases, found_issues, found_reviews] = await Promise.all(fetch_all);
 
-      core.info(`Found ${issues.length} issues in ${out.project_repo}...`);
-      issues = issues_response.data;
+      core.info(`Found ${found_releases.data.length} releases (status code: ${found_releases.status})...`);
+      core.info(`Found ${found_issues.data.length} issues (status code: ${found_issues.status})...`);
+      core.info(`Found ${found_reviews.data.length} reviews (status code: ${found_reviews.status})...`);
     }
     catch (error) {
-      const message = `Unable to fetch issues from ${out.project_repo}: ${error.message}).`;
+      const message = `Unable to fetch releases, issues, and/or pull requests from ${out.project_repo}: ${error.message}.`;
       return handleError(message, true);
     } 
   }
