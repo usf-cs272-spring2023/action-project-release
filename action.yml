@@ -1,5 +1,5 @@
-name: "Project Version Action"
-description: "Reusable action for checking the project release version"
+name: "Project Release Action"
+description: "Reusable action for checking the project release and version number"
 
 inputs:
   project_repo:
@@ -11,13 +11,66 @@ inputs:
     required: true
 
 outputs:
+  # save the input values in the output
+  project_repo:
+    description: "Repository with project code"
+    value: "${{ steps.check-release.outputs.project_repo }}"
+
+  release_tag:
+    description: "Project release number or tag (e.g. v1.0.0)"
+    value: "${{ steps.check-release.outputs.release_tag }}"
+
+  # artifact information with all of the results in json format
   results_name:
     description: "Name of results artifact"
-    value: "${{ steps.check-version.outputs.results_name }}"
+    value: "${{ steps.check-release.outputs.results_name }}"
 
   results_json:
     description: "Name of results JSON file"
-    value: "${{ steps.check-version.outputs.results_json }}"
+    value: "${{ steps.check-release.outputs.results_json }}"
+
+  # version information
+  version_number:
+    description: "Project version number parsed from the release tag"
+    value: "${{ steps.check-release.outputs.version_number }}"
+
+  version_project:
+    description: "Project number parsed from the version number"
+    value: "${{ steps.check-release.outputs.version_project }}"
+
+  version_review:
+    description: "Review number parsed from the version number"
+    value: "${{ steps.check-release.outputs.version_review }}"
+
+  version_patch:
+    description: "Patch number parsed from the version number"
+    value: "${{ steps.check-release.outputs.version_patch }}"
+
+  # request information
+  grade_tests:
+    description: "True if this release can be used to request a project tests grade"
+    value: "${{ steps.check-release.outputs.grade_tests }}"
+
+  grade_review:
+    description: "True if this release can be used to request a project review grade"
+    value: "${{ steps.check-release.outputs.grade_review }}"
+
+  grade_design:
+    description: "True if this release can be used to request a project design grade"
+    value: "${{ steps.check-release.outputs.grade_design }}"
+
+  request_review:
+    description: "True if this release can be used to request a project code review appointment"
+    value: "${{ steps.check-release.outputs.request_review }}"
+
+  # status information
+  error_count:
+    description: "The number of errors produced by this action"
+    value: "${{ steps.check-release.outputs.error_count }}"
+
+  error_messages:
+    description: "All error messages produced by this action"
+    value: "${{ steps.check-release.outputs.error_messages }}"
 
 runs:
   using: "composite"
@@ -26,10 +79,10 @@ runs:
       id: checkout-action
       uses: actions/checkout@v3
       with:
-        repository: usf-cs272-fall2022/action-project-version
+        repository: usf-cs272-fall2022/action-project-release
 
-    - name: 'Check Project Version'
-      id: check-version
+    - name: 'Check Release'
+      id: check-release
       uses: actions/github-script@v6
       env:
         PROJECT_REPO: "${{ inputs.project_repo }}"
@@ -43,7 +96,7 @@ runs:
   
     - name: 'Upload Results'
       uses: actions/upload-artifact@v3
-      id: upload-artifact
+      id: upload-results
       with:
-        name: "${{ steps.check-version.outputs.results_name }}"
-        path: "${{ steps.check-version.outputs.results_json }}"
+        name: "${{ steps.check-release.outputs.results_name }}"
+        path: "${{ steps.check-release.outputs.results_json }}"
