@@ -94,6 +94,11 @@ runs:
           const result = await script({github, context, core, fs});
           return result;
   
+    - name: 'Check Artifact'
+      id: check-artifact
+      shell: bash
+      run: "ls -la"
+
     - name: 'Upload Results'
       uses: actions/upload-artifact@v3
       id: upload-results
