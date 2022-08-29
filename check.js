@@ -2,7 +2,8 @@ module.exports = async ({github, context, core, fs}) => {
   // store results
   const out = {
     error_count: 0,
-    error_messages: []
+    error_messages: [],
+    project_repo: process.env.PROJECT_REPO
   };
 
   // common operations when an error is found
@@ -20,32 +21,14 @@ module.exports = async ({github, context, core, fs}) => {
     return out;
   };
 
-  // get inputs from environment and add to outputs
-  out.project_repo = process.env.PROJECT_REPO;
-  out.release_tag  = process.env.RELEASE_TAG;
+  // get version information from environment
+  const version = process.env.VERSION_JSON;
 
-  core.info('');
   core.info(`Repository: ${out.project_repo}`);
-  core.info(`   Release: ${out.release_tag}`);
-  core.info('');
+  core.info(version);
 
+  /*
   try {
-    // parse release tag into parts
-    const regex = /^v([1-4])\.(\d+)\.(\d+)$/;
-    const matched = out.release_tag.match(regex);
-
-    if (matched === null || matched.length !== 4) {
-      // cannot continue without a parsable version number
-      const message = `Unable to parse "${out.release_tag}" into major, minor, and patch version numbers.`;
-      return handleError(message, true);
-    }
-
-    // save parsed values
-    out.version_project = parseInt(matched[1]);
-    out.version_review  = parseInt(matched[2]);
-    out.version_patch   = parseInt(matched[3]);
-    out.version_number  = `v${out.version_project}.${out.version_review}.${out.version_patch}`;
-
     // default parameters for github API requests
     const params = {
       owner: context.repo.owner,
@@ -53,13 +36,16 @@ module.exports = async ({github, context, core, fs}) => {
       per_page: 100
     }
 
-    // fetch all releases, issues, and reviews
-    const fetch_releases = github.rest.repos.listReleases(params);
-    const fetch_issues   = github.rest.issues.listForRepo({...params, state: 'all'});
-    const fetch_reviews  = github.rest.pulls.list({...params, state: 'all'});
-    const fetch_all = [fetch_releases, fetch_issues, fetch_reviews];
+    // check if code compiles, passes tests, and the other checks
+    // TODO Pass in status via input
 
+    // fetch all releases, issues, and reviews
     try {
+      const fetch_releases = github.rest.repos.listReleases(params);
+      const fetch_issues   = github.rest.issues.listForRepo({...params, state: 'all'});
+      const fetch_reviews  = github.rest.pulls.list({...params, state: 'all'});
+
+      const fetch_all = [fetch_releases, fetch_issues, fetch_reviews];
       const [found_releases, found_issues, found_reviews] = await Promise.all(fetch_all);
 
       core.info(`Found ${found_releases.data.length} releases (status code: ${found_releases.status})...`);
@@ -100,6 +86,7 @@ module.exports = async ({github, context, core, fs}) => {
     }
     core.endGroup();
   }
+  */
 
   return out;
 }

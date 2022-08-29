@@ -81,18 +81,29 @@ runs:
       with:
         repository: usf-cs272-fall2022/action-project-release
 
+    - name: 'Parse Version'
+      id: parse-version
+      uses: actions/github-script@v6
+      env:
+        RELEASE_TAG: "${{ inputs.release_tag }}"
+      with:
+        script: |
+          const script = require('./parse.js');
+          return await script({core});
+
+    # TODO: add compile etc. checks
+
     - name: 'Check Release'
       id: check-release
       uses: actions/github-script@v6
       env:
         PROJECT_REPO: "${{ inputs.project_repo }}"
-        RELEASE_TAG:  "${{ inputs.release_tag }}"
+        VERSION_JSON: "${{ steps.parse-version.outputs.result }}"
       with:
         script: |
           const fs = require('fs');
-          const script = require('./index.js');
-          const result = await script({github, context, core, fs});
-          return result;
+          const script = require('./check.js');
+          return await script({github, context, core, fs});
   
     - name: 'Check Artifact'
       id: check-artifact
