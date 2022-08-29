@@ -11,10 +11,10 @@ module.exports = async ({github, context, core, fs}) => {
     out.error_messages.push(message);
 
     if (fail) {
-      core.error(message);
+      core.setFailed(message);
     }
     else {
-      core.warning(message);
+      core.error(message);
     }
     
     return out;
@@ -27,6 +27,7 @@ module.exports = async ({github, context, core, fs}) => {
   core.info('');
   core.info(`Repository: ${out.project_repo}`);
   core.info(`   Release: ${out.release_tag}`);
+  core.info('');
 
   try {
     // parse release tag into parts
