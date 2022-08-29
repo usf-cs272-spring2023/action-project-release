@@ -24,23 +24,67 @@ module.exports = async ({github, context, core, fs}) => {
   out.review_num  = parseInt(matched[2]);
   out.patch_num   = parseInt(matched[3]);
 
-  // out.project_ok = false;
-  // out.review_ok  = false;
-  
+  // verify the project number
+  if (out.project_num === 1) {
+    out.project_okay = true;
+  }
+  else {
+    // octokit.rest.pulls.list({
+    //   owner,
+    //   repo,
+    // });
 
-  // let [someResult, anotherResult] = await Promise.all([
-  //   someCall(), 
-  //   octokit.rest.repos.listReleases({
-  //     owner: context.repo.owner,
-  //     repo: context.repo.repo,
-  //   });
-  // ]);
+    try {
+      const previous_issues = await github.rest.issues.listForRepo({
+        owner: context.repo.owner,
+        repo: out.project_repo,
+        labels: `project${out.project_num - 1}`,
+        per_page: 100
+      });
+
+      if (previous_issues.status === 200 && previous_issues.data.length > 0) {
+        const pull_requests = previous_issues.data.filter(request => )
+      }
+      else {
+        out.project_ok = false;
+        out.project_error = `Unexpected result: ${JSON.stringify(previous_issues)}`;
+      }
+    }
+    catch (error) {
+      out.project_ok = false;
+      out.project_error = `Unable to find any project ${out.project_num - 1} code reviews. You should have at least one project ${out.project_num - 1} code review before starting project ${out.project_num}.`;
+    }
+
+    // should not start working on next project until
+    // have at least one review from previous project
+    
+
+  }
+
+  // octokit.rest.pulls.list({
+  //   owner,
+  //   repo,
+  // });
+
+  // const current_issues = await github.rest.issues.listForRepo({
+  //   owner: context.repo.owner,
+  //   repo: out.project_repo,
+  //   labels: [`project${out.project_num}`],
+  //   per_page: 100
+  // });
 
   // check project number (p)
   // must have 2 review issues for project (p - 1)
 
   // check review number (r)
   // must have (r - 1) approved pull requests
+  if (out.review_num === 0) {
+    // should be no pull requests
+  }
+  else {
+    // if 1, there should be a test grade and no pull requests
+    // if 2+, there should be r - 1 pull requests
+  }
 
   // verify the patch number
   if (out.patch_num === 0) {
@@ -51,14 +95,18 @@ module.exports = async ({github, context, core, fs}) => {
     const previous_tag = `v${out.project_num}.${out.review_num}.${out.patch_num - 1}`;
     
     try {
-      const result = await github.rest.repos.getReleaseByTag({
+      const tag_result = await github.rest.repos.getReleaseByTag({
         owner: context.repo.owner,
         repo: out.project_repo,
         tag: previous_tag
       });
 
-      if (result.status === 200 && result.data.length === 1) {
+      if (tag_result.status === 200 && tag_result.data.length === 1) {
         out.patch_ok = true;
+      }
+      else {
+        out.patch_ok = false;
+        out.patch_error = `Unexpected result: ${JSON.stringify(tag_result)}`;
       }
     }
     catch (error) {
