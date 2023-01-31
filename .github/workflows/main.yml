@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: 'Check Release'
         id: check-release
-        uses: usf-cs272-fall2022/action-project-release@main
+        uses: usf-cs272-spring2023/action-project-release@main
         with:
           project_repo: "${{ inputs.project_repo }}"
           release_tag:  "${{ inputs.release_tag }}"
